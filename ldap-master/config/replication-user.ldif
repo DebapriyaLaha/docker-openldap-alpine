@@ -1,0 +1,6 @@
+dn: cn=replicator,%SUFFIX%
+cn: Replicator
+sn: LDAP Replication User
+objectClass: person
+objectClass: top
+userPassword: %REPLICATION_PWD_HASH%

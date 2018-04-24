@@ -1,0 +1,24 @@
+dn: olcDatabase={2}mdb,cn=config
+changetype: modify
+add: olcSyncrepl
+olcSyncRepl: {0}rid=001
+  provider="ldap://dockeropenldapalpine_ldap_1:389"
+  searchbase="%SUFFIX%"
+  filter="(objectClass=*)"
+  type=refreshAndPersist
+  retry="60 10 300 +"
+  timeout=100
+  scope=sub
+  schemachecking=on
+  bindmethod=simple
+  binddn="cn=replicator,%SUFFIX%"
+  credentials=replication
+  logbase="cn=accesslog"
+  logfilter="(objectClass=*)"
+  syncdata=accesslog
+  tls_cert=%CERT_FILE%
+  tls_key=%KEY_FILE%
+  tls_cacert=%CA_FILE%
+-
+add: olcUpdateRef
+olcUpdateRef: ldap://dockeropenldapalpine_ldap_1:389

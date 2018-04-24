@@ -1,0 +1,14 @@
+dn: uid=%USER_UID%,ou=Users,%SUFFIX%
+objectclass: top
+objectclass: person
+objectclass: organizationalPerson
+objectclass: inetOrgPerson
+objectclass: orgApplicationUser
+uid: %USER_UID%
+cn: %USER_GIVEN_NAME%  %USER_SURNAME%
+sn: %USER_SURNAME%
+ORGID: org-123
+applicationkey: APP-12354
+mail: %USER_EMAIL%
+userPassword: %USER_PW%
+ou: Users

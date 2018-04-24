@@ -1,0 +1,25 @@
+
+dn: cn=default,ou=pwpolicies,%SUFFIX%
+cn: default
+sn: Default Password Policy
+objectClass: pwdPolicyChecker
+objectClass: pwdPolicy
+objectClass: person
+objectClass: top
+pwdAttribute: 2.5.4.35
+pwdMinAge: 0
+pwdMaxAge: 0
+pwdInHistory: 0
+pwdCheckQuality: 0
+pwdMinLength: 6
+pwdExpireWarning: 0
+pwdGraceAuthNLimit: 0
+pwdLockout: TRUE
+pwdLockoutDuration: 3600
+pwdMaxFailure: 10
+pwdFailureCountInterval: 300
+pwdMustChange: FALSE
+pwdAllowUserChange: TRUE
+pwdSafeModify: FALSE
+
+

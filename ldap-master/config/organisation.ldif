@@ -1,0 +1,24 @@
+# ORGANISATION
+dn: %SUFFIX%
+objectClass: top
+objectClass: dcObject
+objectClass: organization
+o: %ORGANISATION_NAME%
+
+# ORGANISATION Application Users
+dn: ou=Users,%SUFFIX%
+objectClass: organizationalUnit
+ou: Users
+
+# ORGANISATION Application Group
+dn: ou=group,%SUFFIX%
+objectClass: top
+objectclass: organizationalunit
+ou: groups
+
+dn: ou=pwpolicies,%SUFFIX%
+ou: pwpolicies
+objectClass: organizationalUnit
+objectClass: top
+
+

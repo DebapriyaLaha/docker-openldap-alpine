@@ -1,0 +1,54 @@
+
+dn: olcDatabase={3}mdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: {3}mdb
+olcMonitoring: TRUE
+olcDbDirectory: /data/accesslog
+olcSuffix: cn=accesslog
+olcRootDN: cn=accesslog
+olcRootPW: %CNCONFIG_PW_HASH%
+olcDbMaxSize: 42949672960
+olcDbIndex: default eq
+olcDbIndex: entryCSN,objectClass,reqEnd,reqResult,reqStart
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcSyncUseSubentry: FALSE
+olcDbNoSync: TRUE
+olcAccess: {0}to *
+  by dn.exact="cn=manager,cn=config" read
+  by dn.exact="cn=manager,%SUFFIX%" read
+  by dn.exact="cn=replicator,%SUFFIX%" read
+  by * none
+olcLimits: {0}dn.exact="cn=manager,%SUFFIX%"
+  size.soft=unlimited size.hard=unlimited
+  time.soft=unlimited time.hard=unlimited
+olcLimits: {1}dn.exact="cn=replicator,%SUFFIX%"
+  size.soft=unlimited size.hard=unlimited
+  time.soft=unlimited time.hard=unlimited
+
+dn: olcOverlay=accesslog,olcDatabase={2}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcAccessLogConfig
+olcOverlay: accesslog
+olcAccessLogDB: cn=accesslog
+olcAccessLogOps: writes
+olcAccessLogPurge: 7+00:00 1+00:00
+olcAccessLogSuccess: TRUE
+
+dn: olcOverlay=syncprov,olcDatabase={2}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+olcSpCheckPoint: 100 5
+olcSpNoPresent: FALSE
+olcSpReloadHint: TRUE
+
+dn: olcOverlay=syncprov,olcDatabase={3}mdb,cn=config
+objectClass: olcOverlayConfig
+objectClass: olcSyncProvConfig
+olcOverlay: syncprov
+olcSpNoPresent: TRUE
+olcSpReloadHint: TRUE

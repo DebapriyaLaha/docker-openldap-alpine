@@ -1,0 +1,80 @@
+version: '3'
+
+services:
+
+  cert:
+    image: pgarrett/openssl-alpine
+    environment:
+      - COUNTY=US
+      - STATE=NY
+      - LOCATION=NYC
+      - ORGANISATION=Example
+      - ISSUER_CN=Example
+      - PUBLIC_CN=dockeropenldapalpine_ldap_1
+      - ISSUER_NAME=ORGANISATION
+    volumes:
+      - ./certs:/etc/ssl/certs
+
+  ldap:
+    build:
+      context: ldap-master/
+    depends_on:
+      - cert
+    deploy:
+      resources:
+        limits:
+          cpus: '2.001'
+          memory: 200M
+    ports:
+      - 636:636
+      - 389:389
+    hostname: ldap.example.com
+    environment:
+      - CA_FILE=/etc/ssl/certs/ca.pem
+      - KEY_FILE=/etc/ssl/certs/public.key
+      - CERT_FILE=/etc/ssl/certs/public.crt
+      - TYPE=MASTER
+    volumes:
+      - ./certs:/etc/ssl/certs
+      - ldap_config:/ldap-config
+      - ldap_data:/var/lib/openldap/openldap-data
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+  ldapslave:
+    build:
+      context: ldap-slave/
+    depends_on:
+      - cert
+      - ldap
+    deploy:
+      resources:
+        limits:
+          cpus: '1.001'
+          memory: 100M
+    ports:
+      - 1636:636
+      - 1389:389
+    hostname: ldap.example.com
+    environment:
+      - CA_FILE=/etc/ssl/certs/ca.pem
+      - KEY_FILE=/etc/ssl/certs/public.key
+      - CERT_FILE=/etc/ssl/certs/public.crt
+      - TYPE=SLAVE
+    volumes:
+      - ./certs:/etc/ssl/certs
+      - ldap_config:/ldap-config
+      - ldap_data:/var/lib/openldap/openldap-data
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 20000
+        hard: 40000
+
+
+volumes:
+  ldap_data:
+  ldap_config:

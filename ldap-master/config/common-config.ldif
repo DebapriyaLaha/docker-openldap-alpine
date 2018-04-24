@@ -1,0 +1,118 @@
+#Global Configuration
+
+dn: cn=config
+objectClass: olcGlobal
+cn: config
+olcConfigDir: /etc/opt/openldap/slapd.d
+olcArgsFile: /var/openldap/slapd.args
+olcPidFile: /var/openldap/slapd.pid
+olcTLSCACertificateFile: %CA_FILE%
+olcTLSCertificateKeyFile: %KEY_FILE%
+olcTLSCertificateFile: %CERT_FILE%
+structuralObjectClass: olcGlobal
+creatorsName: cn=config
+olcTLSVerifyClient: never
+
+# Load the mdb backend
+dn: cn=module,cn=config
+objectClass: olcModuleList
+cn: module
+olcModulepath: /usr/lib/openldap/
+olcModuleload: back_mdb.so
+olcModuleload: back_monitor.so
+olcModuleload: syncprov.so
+olcModuleload: auditlog.so
+olcModuleload: accesslog.so
+olcModuleload: ppolicy.so
+
+# Load external definitions
+dn: cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: schema
+
+# Core .ldif include
+include: file:///etc/openldap/schema/core.ldif
+include: file:///etc/openldap/schema/cosine.ldif
+include: file:///etc/openldap/schema/nis.ldif
+include: file:///etc/openldap/schema/inetorgperson.ldif
+include: file:///etc/openldap/schema/openldap.ldif
+include: file:///etc/openldap/schema/ppolicy.ldif
+include: file:///etc/openldap/schema/duaconf.ldif
+
+# front end db
+dn: olcDatabase={-1}frontend,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcFrontendConfig
+olcDatabase: {-1}frontend
+olcSizelimit: size.soft=10000 size.hard=1000000
+olcTimelimit: time.soft=300 time.hard=3600
+olcAccess: {0}to attrs=userPassword
+  by self =xw
+  by anonymous auth
+  by * none
+olcAccess: {1}to * by * write by * read
+
+# DB Configuration
+dn: olcDatabase={0}config,cn=config
+objectClass: olcDatabaseConfig
+olcDatabase: {0}config
+olcRootDN: cn=manager,cn=config
+# generate a password by running slappasswd
+olcRootPW: %CNCONFIG_PW_HASH%
+olcMonitoring: FALSE
+olcAccess: {0}to dn.subtree="cn=config"
+  by users read
+olcAccess: {1}to * by * read
+
+
+dn: olcDatabase={1}monitor,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcMonitorConfig
+olcDatabase: {1}monitor
+olcAddContentAcl: FALSE
+olcLastMod: TRUE
+olcMaxDerefDepth: 15
+olcReadOnly: FALSE
+olcSyncUseSubentry: FALSE
+olcMonitoring: FALSE
+olcAccess: to dn.subtree="cn=monitor"
+  by dn.exact="cn=manager,cn=config" read
+  by dn.exact="cn=manager,%SUFFIX%" read
+  by * none
+
+
+dn: olcDatabase={2}mdb,cn=config
+objectClass: olcDatabaseConfig
+objectClass: olcMdbConfig
+olcDatabase: {2}mdb
+olcMonitoring: TRUE
+olcSuffix: %SUFFIX%
+olcRootDN: cn=manager,%SUFFIX%
+olcRootPW: %CNCONFIG_PW_HASH%
+olcDbDirectory: /data/orgdata
+olcDbMaxSize: 42949672960
+olcDbIndex: uid pres,eq
+olcDbIndex: cn,sn pres,eq,approx,sub
+olcDbIndex: mail pres,eq,sub
+olcDbIndex: entryCSN eq
+olcDbIndex: entryUUID eq
+olcAccess: {0}to attrs=userPassword
+  by dn.exact="cn=manager,%SUFFIX%" write
+  by dn.exact="cn=replicator,%SUFFIX%" read
+  by self =xw
+  by anonymous auth
+  by * none
+olcAccess: {1}to *
+  by anonymous auth
+  by self write
+  by dn.exact="cn=replicator,%SUFFIX%" read
+  by users read
+  by * none
+olcAccess: {2}to * by * read
+olcLimits: {0}dn.exact="cn=manager,%SUFFIX%"
+  size.soft=unlimited size.hard=unlimited
+  time.soft=unlimited time.hard=unlimited
+olcLimits: {1}dn.exact="cn=replicator,%SUFFIX%"
+  size.soft=unlimited size.hard=unlimited
+  time.soft=unlimited time.hard=unlimited
+
